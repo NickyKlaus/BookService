@@ -1,0 +1,88 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Book service",
+    "description": "Book Service provides books from the local library",
+    "contact": {
+      "name": "Nicky Klaus",
+      "url": "https://github.com/NickyKlaus"
+    },
+    "version": "1.0.0"
+  },
+  "schemes": [
+    "http", "https"
+  ],
+  "host": "127.0.0.1",
+  "paths": {
+    "/library": {
+      "get": {
+        "description": "Returns all books",
+        "produces": ["application/json"],
+        "summary": "Get books",
+        "responses": {
+          "200": {
+            "description": "A list of books",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          },
+          "404": {
+            "description": "Books not found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Cover": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "Cover binary data",
+          "type": "string",
+          "format": "byte"
+        },
+        "format": {
+          "description": "Cover format",
+          "type": "string",
+          "example": "jpeg"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Book": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Book identifier",
+          "type": "string",
+          "example": "62a8d6e28ac2515e4afedb57"
+        },
+        "name": {
+          "description": "Name of the book",
+          "type": "string",
+          "example": "Name"
+        },
+        "format": {
+          "description": "Book's file format",
+          "type": "string",
+          "example": "djvu"
+        },
+        "text": {
+          "description": "First page of the book",
+          "type": "string",
+          "example": "Text"
+        },
+        "cover": {
+          "description": "Cover of the book",
+          "type": "object",
+          "$ref": "#/definitions/Cover"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

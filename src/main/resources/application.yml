@@ -1,0 +1,18 @@
+# Spring properties
+spring:
+  application:
+    name: bookservice
+  data:
+    mongodb:
+      host: ${BOOKSERVICE_DB_HOST}
+      port: ${BOOKSERVICE_DB_PORT}
+      database: ${BOOKSERVICE_DB_NAME}
+    mongo.repositories.enabled: true
+
+# HTTP Server (Tomcat) Port
+server:
+  port: 8082
+
+error:
+  whitelabel:
+    enabled: false
