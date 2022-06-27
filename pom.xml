@@ -33,12 +33,7 @@
         <javax.xml.bind.version>2.4.0-b180830.0359</javax.xml.bind.version>
         <jackson-datatype-jsr310.version>2.12.4</jackson-datatype-jsr310.version>
         <service-generator-api.version>0.0.1</service-generator-api.version>
-        <base.package.name>com.home.bookservice</base.package.name>
-        <model.package.name>${base.package.name}.model</model.package.name>
-        <api.package.name>${base.package.name}.api</api.package.name>
-        <invoker.package.name>${base.package.name}.invoker</invoker.package.name>
-        <processing-schema-location>${project.basedir}/src/main/resources</processing-schema-location>
-        <service-generator-plugin.version>0.0.1</service-generator-plugin.version>
+        <service-generator-plugin.version>0.0.2</service-generator-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -125,36 +120,6 @@
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
-                <groupId>io.swagger.codegen.v3</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>${swagger-codegen-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/schema/book-service-spec.json</inputSpec>
-                            <language>spring</language>
-                            <modelPackage>${model.package.name}</modelPackage>
-                            <apiPackage>${api.package.name}</apiPackage>
-                            <invokerPackage>${invoker.package.name}</invokerPackage>
-                            <addCompileSourceRoot>true</addCompileSourceRoot>
-                            <configOptions>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <artifactVersion>${project.version}</artifactVersion>
-                                <library>spring-boot</library>
-                                <java8>true</java8>
-                                <dateLibrary>java8</dateLibrary>
-                                <defaultInterfaces>true</defaultInterfaces>
-                                <additionalProperty>jackson=true</additionalProperty>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.home</groupId>
                 <artifactId>service-generator-maven-plugin</artifactId>
                 <version>${service-generator-plugin.version}</version>
@@ -167,12 +132,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <projectOutputDirectory>${project.build.directory}/generated-sources/swagger</projectOutputDirectory>
-                    <sourcesDirectory>/src/main/java</sourcesDirectory>
-                    <basePackage>${base.package.name}</basePackage>
-                    <controllerPackage>api</controllerPackage>
-                    <modelPackage>model</modelPackage>
-                    <configurationPackage>invoker</configurationPackage>
+                    <inputSpec>${project.basedir}/src/main/resources/schema/book-service-spec.json</inputSpec>
                     <dbType>mongo</dbType>
                 </configuration>
             </plugin>
