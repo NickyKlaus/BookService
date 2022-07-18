@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+
+  # Preparation for generated services started
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    hostname: mongodb
+    networks:
+      data-loading:
+        aliases:
+          - mondodb
+    ports:
+      - 27017:27017
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "512M"
+
+  # Run generated Book Service
+  bookservice:
+    image: nickyklaus/bookservice:latest
+    container_name: bookservice
+
+    networks:
+      data-loading:
+        aliases:
+          - bookservice
+    hostname: bookservice
+    ports:
+      - 8080:8080
+    environment:
+      - BOOKSERVICE_DB_HOST=mongo
+      - BOOKSERVICE_DB_PORT=27017
+      - BOOKSERVICE_DB_NAME=library
+    deploy:
+      resources:
+        limits:
+          cpus: "0.7"
+          memory: "1G"
+
+networks:
+  data-loading:
+    driver: "bridge"
