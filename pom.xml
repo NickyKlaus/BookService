@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.home</groupId>
-    <artifactId>BookService</artifactId>
+    <artifactId>bookservice</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
     <name>bookservice</name>
@@ -21,22 +21,68 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <origami-api.version>0.0.3</origami-api.version>
+        <origami-plugin.version>0.0.4</origami-plugin.version>
+        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+        <spring-boot-maven-plugin.version>2.5.3</spring-boot-maven-plugin.version>
+
         <log4j-bom.version>2.17.0</log4j-bom.version>
         <guava.version>31.0.1-jre</guava.version>
         <spring-boot.version>2.5.3</spring-boot.version>
         <spring-plugin-core.version>2.0.0.RELEASE</spring-plugin-core.version>
         <swagger-annotations.version>2.1.10</swagger-annotations.version>
         <springfox.version>3.0.0</springfox.version>
-        <swagger-codegen-maven-plugin.version>3.0.28</swagger-codegen-maven-plugin.version>
         <jackson-datatype-threetenbp.version>2.12.5</jackson-datatype-threetenbp.version>
         <javax.validation.version>2.0.1.Final</javax.validation.version>
         <javax.xml.bind.version>2.4.0-b180830.0359</javax.xml.bind.version>
         <jackson-datatype-jsr310.version>2.12.4</jackson-datatype-jsr310.version>
-        <service-generator-api.version>0.0.1</service-generator-api.version>
-        <service-generator-plugin.version>0.0.2</service-generator-plugin.version>
     </properties>
 
-    <dependencyManagement>
+    <profiles>
+        <profile>
+            <id>no2-v4</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/NickyKlaus/origami-api</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <!--<repository>
+                    <id>github</id>
+                    <name>GitHub Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/NickyKlaus/origami</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>-->
+            </repositories>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
+    <!--<dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -46,7 +92,7 @@
                 <type>pom</type>
             </dependency>
         </dependencies>
-    </dependencyManagement>
+    </dependencyManagement>-->
 
     <dependencies>
         <dependency>
@@ -111,8 +157,8 @@
         </dependency>
         <dependency>
             <groupId>com.home</groupId>
-            <artifactId>service-generator-api</artifactId>
-            <version>${service-generator-api.version}</version>
+            <artifactId>origami-api</artifactId>
+            <version>${origami-api.version}</version>
         </dependency>
     </dependencies>
 
@@ -121,8 +167,8 @@
         <plugins>
             <plugin>
                 <groupId>com.home</groupId>
-                <artifactId>service-generator-maven-plugin</artifactId>
-                <version>${service-generator-plugin.version}</version>
+                <artifactId>origami-maven-plugin</artifactId>
+                <version>${origami-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -135,6 +181,46 @@
                     <inputSpec>${project.basedir}/src/main/resources/schema/book-service-spec.json</inputSpec>
                     <dbType>mongo</dbType>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/swagger</generatedSourcesDirectory>
+                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources-post-compile</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-sources/swagger/src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -153,6 +239,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <basedir>${project.build.outputDirectory}</basedir>
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
@@ -166,9 +253,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
-                    <imageName>bookservice:${project.version}</imageName>
+                    <imageName>bookservice:latest</imageName>
                     <mainClass>com.home.bookservice.invoker.Swagger2SpringBoot</mainClass>
                 </configuration>
                 <executions>
@@ -182,7 +269,7 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.4.13</version>
+                <version>${dockerfile-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>docker</id>
